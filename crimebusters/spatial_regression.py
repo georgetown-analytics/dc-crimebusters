@@ -49,7 +49,7 @@ class GeographicallyWeightedRegression(object):
         """
         
         #name of the file without dir
-        file_path = os.path.basename(self.infile)
+        file_path = os.path.basename(self.infile).split('.')
         
         #name of the dbf file without dir and add dbf extension
         name = "{0}.dbf".format(file_path[0])
@@ -140,10 +140,18 @@ class GeographicallyWeightedRegression(object):
         ols = pysal.spreg.OLS(dependent_array, indepent_array,
                               w=weights, name_y=self.dependent_var, 
                               name_x=self.independent_vars, name_ds=os.path.basename(self.infile),
-                                spat_daig=True, moran=True, white_test=True)
+                                spat_diag=True, moran=True, white_test=True)
                                 
         if self.outfile_summary:
             self._save_summary(ols)
         print ols.summary
         
+        open_dbf.close()
         
+        
+if __name__ == "__main__":
+    shapefile=os.path.abspath(os.path.join(os.path.dirname(__file__), "..","..","Data",'MetHoodsWithMedCensusCrimeMetDist_Clipped.shp'))
+    dependent = "COUNT"
+    independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
+    gwr =GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen")
+    gwr.run()
