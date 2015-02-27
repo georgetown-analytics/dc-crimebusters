@@ -88,7 +88,7 @@ class GeographicallyWeightedRegression(object):
         """
         writes the output of the ols to file
         """
-        with open(self.save_summary, "w") as target:
+        with open(self.outfile_summary, "w") as target:
             target.write(ols.summary)   
             
     def _get_spatial_weights(self):
@@ -153,5 +153,5 @@ if __name__ == "__main__":
     shapefile=os.path.abspath(os.path.join(os.path.dirname(__file__), "..","..","Data",'MetHoodsWithMedCensusCrimeMetDist_Clipped.shp'))
     dependent = "COUNT"
     independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
-    gwr =GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen")
+    gwr = GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen", out_summary="GWR_Results.txt")
     gwr.run()
