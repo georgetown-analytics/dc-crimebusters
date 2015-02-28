@@ -11,6 +11,7 @@ import pandas as pd
 from pandas.tools.plotting import scatter_matrix
 import pysal
 import numpy as np
+import sys
 
 
 def get_data_as_frame(filepath, columns):
@@ -23,8 +24,8 @@ def get_data_as_frame(filepath, columns):
     return pd.DataFrame(data=array.T, columns=columns)
 
 print"Running..."
-in_data=r'MetHoodsWithMedCensusCrimeMetDist_Clipped.dbf'
+in_data = sys.argv[1] #This is the path to the .dbf file. 
 cols = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr", "COUNT"]
 frame = get_data_as_frame(in_data, cols)
 print"making plot..."
-scatter_matrix(frame, figsize=(5,5), diagonal="kde")
+scatter_matrix(frame, figsize=(15,15), diagonal="kde")
