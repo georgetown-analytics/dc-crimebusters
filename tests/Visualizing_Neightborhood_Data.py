@@ -23,9 +23,11 @@ def get_data_as_frame(filepath, columns):
     open_dbf.close()
     return pd.DataFrame(data=array.T, columns=columns)
 
-print"Running..."
-in_data = sys.argv[1] #This is the path to the .dbf file. 
-cols = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr", "COUNT"]
-frame = get_data_as_frame(in_data, cols)
-print"making plot..."
-scatter_matrix(frame, figsize=(15,15), diagonal="kde")
+
+if __name__ == "__main__":
+    print"Running..."
+    in_data = sys.argv[1] #This is the path to the .dbf file. 
+    cols = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr", "COUNT"]
+    frame = get_data_as_frame(in_data, cols)
+    print"making plot..."
+    scatter_matrix(frame, figsize=(15,15), diagonal="kde")
