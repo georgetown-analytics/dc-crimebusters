@@ -12,7 +12,7 @@ from sklearn import cross_validation
 ########################################################################
 class BuildEventPlanner(object):
 
-	filename = 'CrimeEventsWCensusMetDistAndName.csv'
+	filename = 'CrimeEventsWCensusMetDistAndName.csv' # Just placed here for testing purposes
 	
 	def __init__(self, filename):
 		self.filename = filename
@@ -20,11 +20,11 @@ class BuildEventPlanner(object):
 	def featureset(self, filename):
 		# Produce the test and training sets
 		# Read csv file into a structured pandas dataframe
-		df = pd.read_csv(filename, sep = ",", quotechar = '"',skipinitialspace = True)
-
+		# df = pd.read_csv(filename, sep = ",", quotechar = '"',skipinitialspace = True)
+		df = np.genfromtxt(filename,delimiter=",")
 		# For the purpose of using scikit learn functions on this data,
 		# tranform dataframe into a numpy array
-		df_array = np.array(df)
+		# df_array = np.array(df)
 
 		## Split data into test and train sets using KFold
 		# We can decide on the n and k
