@@ -8,6 +8,7 @@ Created on Tue Feb 17 21:11:35 2015
 #import pickle
 #import time
 #from datetime import datetime
+import csv
 
 class BuildEventPlanner(object):
     """
@@ -17,12 +18,13 @@ class BuildEventPlanner(object):
     and a support vector machine (SVM)
     """
     
-    def __init__(self):
+    def __init__(self, in_file):
         """
         This is where the class will be initialized. Parameters
         will be dictated by other class functions.
         """
-        pass
+        self.in_file = in_file
+        self.features = None
     
     def featureset(self):
         """
@@ -31,7 +33,8 @@ class BuildEventPlanner(object):
         the census data and metro data. The featureset data should
         be stored in the fixtures folder
         """
-        pass
+        with open(self.in_file, 'rb') as in_data:
+            pass
     
     def train(self, featureset=None):
         """
