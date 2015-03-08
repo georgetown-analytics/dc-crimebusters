@@ -151,7 +151,7 @@ class GeographicallyWeightedRegression(object):
         
         
 if __name__ == "__main__":
-    shapefile= settings["shape_file"]
+    shapefile= settings["shapefile"]
     dependent = "COUNT"
     independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
     #See GWR_Results.txt in the tests directory for spatial regression performance

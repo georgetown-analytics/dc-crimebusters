@@ -56,7 +56,6 @@ class BuildEventPlanner(object):
         
         These are the fields I am working with:
         [OFFENSE	MIDNIGHT	DAY	EVENING	VacantUnitRate	LongCommuteRate	PublicTransitCommuters	MedIncomeInTenThousands	MedHomeValueInHundredThousands	DistFromMetKm]
-
         
         I removed the extraneous data and stored this as a separate csv. I 
         was not able to use a numpy array b/c they do not support multiple 
@@ -132,6 +131,7 @@ class BuildEventPlanner(object):
             #kernal. Refer to this site: http://scikit-learn.org/stable/modules/svm.html
             #Would also be worthwile to investigate sklearn.svm.LinearSVC and sklearn.linear_model.SGDClassifier
             
+            #This classifier produced ~40% accuracy
             classifier = svm.SVC(probability=probability)
             
             classifier.fit(X, y)
