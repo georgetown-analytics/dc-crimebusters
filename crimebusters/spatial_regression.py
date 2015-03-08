@@ -154,5 +154,8 @@ if __name__ == "__main__":
     shapefile= settings["shape_file"]
     dependent = "COUNT"
     independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
-    gwr = GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen", out_summary="GWR_Results.txt")
+    #See GWR_Results.txt in the tests directory for spatial regression performance
+    #Initial run with these features produced a model with an coefficient of 
+    #determination (R^2) of ~0.08 --> not very good
+    gwr = GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen", out_summary=settings["spatial_regression_summary"])
     gwr.run()
