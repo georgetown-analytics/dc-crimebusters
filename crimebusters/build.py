@@ -12,6 +12,7 @@ import time
 import json
 import pickle 
 import random
+from conf import settings
 from sklearn import svm
 from datetime import datetime
 
@@ -23,7 +24,7 @@ class BuildEventPlanner(object):
         #today's date        
         today = datetime.now().strftime('%Y-%d-%m')
         
-        self.filename = in_data
+        self.filename = in_data or settings["data"]
         self.features = None
         self.classification_field = kwargs.pop("classification_field", "OFFENSE")
         self.accuracy = None
@@ -162,6 +163,7 @@ class BuildEventPlanner(object):
         classifier = self.train()
         
         with open(self.out_model, "w") as target:
+            sys.stdout.write("Saving model to {0}".format(self.out_model))
             pickle.dump(classifier, target, pickle.HIGHEST_PROTOCOL)
             
         if self.validate:
@@ -243,12 +245,12 @@ class BuildEventPlanner(object):
         }
         
         with open(self.out_model_log, 'w') as target:
+            sys.stdout.write("Saving log to {0}".format(self.out_model_log))
             json.dump(details, target, indent=4)
         
     
 if __name__ == "__main__":
-    infile = os.path.join('..',r'Data/Crime_for_classifier_Normalized_Nulls_Removed.csv')
-    event_planner = BuildEventPlanner(infile)
+    event_planner = BuildEventPlanner(settings["data"])
     event_planner.build()
     #raw_input("\nPress enter to quit.")
         
