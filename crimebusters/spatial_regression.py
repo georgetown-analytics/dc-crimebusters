@@ -14,6 +14,7 @@ matrix first.
 import os
 import pysal
 import numpy as np
+from conf import settings
 
 
 class GeographicallyWeightedRegression(object):
@@ -150,7 +151,7 @@ class GeographicallyWeightedRegression(object):
         
         
 if __name__ == "__main__":
-    shapefile=os.path.abspath(os.path.join(os.path.dirname(__file__), "..","..","Data",'MetHoodsWithMedCensusCrimeMetDist_Clipped.shp'))
+    shapefile= settings["shape_file"]
     dependent = "COUNT"
     independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
     gwr = GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen", out_summary="GWR_Results.txt")
