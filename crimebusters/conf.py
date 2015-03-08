@@ -20,8 +20,9 @@ class CrimeBustersConfig(confire.Configuration):
     settings. 
     
     "data" is the input data for the classifier
-    "shape_file" is the input shapefile for spatial regression
+    "shapefile" is the input shapefile for spatial regression
     "spatial_regression_summary" is the output file for spatial regression
+    dbf_file is the file associated with the shapefile. 
     """
     CONF_PATHS = [
     "/etc/path_variables.yaml", 
@@ -32,6 +33,7 @@ class CrimeBustersConfig(confire.Configuration):
     data = None
     shapefile = None
     spatial_regression_summary = None
+    dbf_file = None
     
 settings = CrimeBustersConfig.load()
 

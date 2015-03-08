@@ -6,12 +6,14 @@ Created on Thu Feb 26 14:29:29 2015
 
 Exploring spatial data
 """
-
-import pandas as pd
-from pandas.tools.plotting import scatter_matrix
+import os
+import sys
 import pysal
 import numpy as np
-import sys
+import pandas as pd
+from pandas.tools.plotting import scatter_matrix
+sys.path.append(os.path.join("..", 'crimebusters'))
+from conf import settings
 
 
 def get_data_as_frame(filepath, columns):
@@ -26,7 +28,8 @@ def get_data_as_frame(filepath, columns):
 
 if __name__ == "__main__":
     print"Running..."
-    in_data = sys.argv[1] #This is the path to the .dbf file. 
+    
+    in_data = settings["dbf_file"]
     cols = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr", "COUNT"]
     frame = get_data_as_frame(in_data, cols)
     print"making plot..."
