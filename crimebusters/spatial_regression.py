@@ -156,5 +156,8 @@ if __name__ == "__main__":
     independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
     #Initial run with these features produced a model with an coefficient of 
     #determination (R^2) of ~0.08 --> not very good
-    gwr = GeographicallyWeightedRegression(shapefile,dependent, independent,spatial_relationship="queen", out_summary=settings["spatial_regression_summary"])
+    gwr = GeographicallyWeightedRegression(shapefile,dependent, 
+                                           independent,
+                                           spatial_relationship="queen", 
+                                           out_summary=settings["spatial_regression_summary"])
     gwr.run()
