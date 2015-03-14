@@ -106,6 +106,9 @@ class GeographicallyWeightedRegression(object):
         if self.spat_weights == "queen":
             return pysal.queen_from_shapefile(self.infile)
             
+        elif self.spat_weights == "rook":
+            return pysal.rook_from_shapefile(self.infile)
+            
         else:
             #won't use spatial weights
             return None
@@ -152,8 +155,8 @@ class GeographicallyWeightedRegression(object):
         
 if __name__ == "__main__":
     shapefile= settings["shapefile"]
-    dependent = "COUNT"
-    independent = ["MEANDISTFR","MEANHomeIn", "MEANHomVal","MEANTrvlGr"]
+    dependent = "CrimPerRid"
+    independent = ['PerUnPover', 'PerLongCom']#'PerVacHous', 'PerComMet']
     #Initial run with these features produced a model with an coefficient of 
     #determination (R^2) of ~0.08 --> not very good
     gwr = GeographicallyWeightedRegression(shapefile,dependent, 
