@@ -42,6 +42,10 @@ class GeographicallyWeightedRegression(object):
         #just setting one representation
         self.spat_weights = kwargs.pop("spatial_relationship", "queen")
         
+        self.independent_array = None
+        self.dependent_array = None
+        self.weights = None
+        self._summary = None
         
     def _get_shapefile_dbf(self):
         """
@@ -122,7 +126,7 @@ class GeographicallyWeightedRegression(object):
         #working_file = pysal.open(self.infile)
 
         #create the spatial weights matrix
-        weights = self._get_spatial_weights()
+        self.weights = self._get_spatial_weights()
         
         #all shapefiles come with a dbf file
         #this will open that
@@ -132,35 +136,37 @@ class GeographicallyWeightedRegression(object):
         open_dbf = pysal.open(dbf_file)
         
         #create the dependent array for OLS input
-        dependent_array = self._get_dependent_var_array(open_dbf)
+        self.dependent_array = self._get_dependent_var_array(open_dbf)
         
         #create the indepent array for OLS input
-        indepent_array = self._get_independent_matrix(open_dbf)
+        self.independent_array = self._get_independent_matrix(open_dbf)
         
         #run the OLS
         #This is set up to run Moran's I on the residuals to ensure
         #they are not spatially correlated and White's test. --> need to
         #find out more what that test does.
-        ols = pysal.spreg.OLS(dependent_array, indepent_array,
-                              w=weights, name_y=self.dependent_var, 
+        ols = pysal.spreg.OLS(self.dependent_array, self.independent_array,
+                              w=self.weights, name_y=self.dependent_var, 
                               name_x=self.independent_vars, name_ds=os.path.basename(self.infile),
                                 spat_diag=True, moran=True, white_test=True)
                                 
         if self.outfile_summary:
             self._save_summary(ols)
-        print ols.summary
+        self._summary = ols.summary
         
         open_dbf.close()
+        
+    def print_summary(self):
+        print self._summary
         
         
 if __name__ == "__main__":
     shapefile= settings["shapefile"]
     dependent = "CrimPerRid"
-    independent = ['PerUnPover', 'PerLongCom']#'PerVacHous', 'PerComMet']
-    #Initial run with these features produced a model with an coefficient of 
-    #determination (R^2) of ~0.08 --> not very good
+    independent = ['PerUnPover', 'PerVacHous','PerLongCom']#, 'PerComMet']
     gwr = GeographicallyWeightedRegression(shapefile,dependent, 
                                            independent,
                                            spatial_relationship="queen", 
                                            out_summary=settings["spatial_regression_summary"])
     gwr.run()
+    gwr.print_summary()
