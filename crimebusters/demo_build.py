@@ -12,7 +12,7 @@ from sklearn import cross_validation
 ########################################################################
 class BuildEventPlanner(object):
 
-	filename = 'CrimeEventsWCensusMetDistAndName.csv' # Just placed here for testing purposes
+	filename = 'CrimeEventsWCensusMetDistAndName_2.csv' # Just placed here for testing purposes
 	
 	def __init__(self, filename):
 		self.filename = filename
