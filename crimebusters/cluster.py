@@ -10,14 +10,14 @@ usually crashes.
 import os
 import time
 import numpy as np
-from datetime import datetime
-from conf import settings
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import Imputer
-from bokeh.charts import Scatter
-from bokeh.plotting import output_file
-from collections import OrderedDict
 import pandas as pd
+from conf import settings
+from datetime import datetime
+from bokeh.charts import Scatter
+from sklearn.cluster import KMeans
+from collections import OrderedDict
+from bokeh.plotting import output_file
+from sklearn.preprocessing import Imputer
 
 #Create a timestamp for the output file
 def time_stamp():
