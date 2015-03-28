@@ -7,7 +7,8 @@ Created on Tue Feb 17 21:31:48 2015
 ## Imports
 ###########################################################################
 
-import pickle
+import dill
+#import pickle
 from conf import settings
 #from build import BuildEventPlanner
 
@@ -33,7 +34,7 @@ class EventClassifier(object):
     		
     		## Load the model from the pickle
     	with open(model, 'rb') as pkl:
-    		self._classifier = pickle.load(pkl)
+    		self._classifier = dill.load(pkl)
     			
     
     def classify(self, instance):

@@ -10,7 +10,8 @@ import csv
 import sys 
 import time
 import json
-import pickle 
+import dill 
+#import pickle 
 import numpy as np
 from conf import settings
 from datetime import datetime
@@ -153,9 +154,9 @@ class BuildEventPlanner(object):
         #Builds the classifier with all of the data
         classifier = self.train()
         
-        with open(self.out_model, "w") as target:
+        with open(self.out_model, "wb") as target:
             sys.stdout.write("Saving model to {0}".format(self.out_model))
-            pickle.dump(classifier, target, pickle.HIGHEST_PROTOCOL)
+            dill.dump(classifier, target, dill.HIGHEST_PROTOCOL)
             
         if self.validate:
             self.cross_validate()
