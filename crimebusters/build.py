@@ -11,11 +11,13 @@ import sys
 import time
 import json
 import dill 
-#import pickle 
 import numpy as np
 from conf import settings
 from datetime import datetime
-from sklearn import svm, cross_validation
+from sklearn import svm
+from sklearn import cross_validation
+#from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import Imputer
 
 ########################################################################
 class BuildEventPlanner(object):
@@ -30,6 +32,7 @@ class BuildEventPlanner(object):
         self.labels = None
         self.classification_field = kwargs.pop("classification_field", "OFFENSE")
         self.accuracy = None
+        self.null_value = kwargs.pop("null_value", -999)
         
         #output directories
         self.out_model = kwargs.pop("out_model",os.path.join("..","fixtures", "model_{0}.pickle".format(today)))
@@ -88,14 +91,17 @@ class BuildEventPlanner(object):
                     target_labels.append(crime)
         
             self.feature_time = time.time() - start
-
-        self.features = np.asfarray(support_features)
+        
+        
+        imputer = Imputer(missing_values=self.null_value, strategy="mean")
+        
+        self.features = imputer.fit_transform(np.array(support_features))
         self.labels = np.array(target_labels)
         
         return self.features, self.labels
                 
         	
-    def train(self, X=None,y=None, probability=True):
+    def train(self, X=None,y=None):
         """
         This is where the algorithmn will be trained using
         an input featureset. The data should come from
@@ -123,8 +129,11 @@ class BuildEventPlanner(object):
             #kernal. Refer to this site: http://scikit-learn.org/stable/modules/svm.html
             #Would also be worthwile to investigate sklearn.svm.LinearSVC and sklearn.linear_model.SGDClassifier
             
-            #This classifier produced ~40% accuracy
-            classifier = svm.SVC(probability=probability)
+            #Tried class_weight="auto" but it produced a worse fit 38%
+            classifier = svm.SVC() #currently at 66%
+            
+            #classifier = DecisionTreeClassifier()  #produced 30% accuracy    
+        
             
             classifier.fit(X, y)
             
@@ -155,7 +164,7 @@ class BuildEventPlanner(object):
         classifier = self.train()
         
         with open(self.out_model, "wb") as target:
-            sys.stdout.write("Saving model to {0}".format(self.out_model))
+            sys.stdout.write("Saving model to {0}\n".format(self.out_model))
             dill.dump(classifier, target, dill.HIGHEST_PROTOCOL)
             
         if self.validate:
@@ -196,7 +205,7 @@ class BuildEventPlanner(object):
             y_train, y_test = labels[train], labels[test]
         
         
-            classifier = self.train(X_train, y_train, probability=False)
+            classifier = self.train(X_train, y_train)
             scores.append(classifier.score(X_test, y_test))
         self.accuracy = sum(scores)/len(scores) #average score of the folds
         self.test_time = time.time() - start 
@@ -237,8 +246,10 @@ class BuildEventPlanner(object):
         
     
 if __name__ == "__main__":
+    
+    #used 3 folds b/c of the limited number of classes
     event_planner = BuildEventPlanner(settings["data"], n_folds=3)
-    cls = event_planner.build()
+    event_planner.build()
     #raw_input("\nPress enter to quit.")
         
 		
