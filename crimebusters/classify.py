@@ -23,11 +23,12 @@ class EventClassifier(object):
     from build.py
     """
     
-    def __init__(self, model=None):
+    def __init__(self, model=None, **kwargs):
         """
         Initialize the event classifier with the model
         created in build.py
         """
+        self._give_explaination = kwargs.pop("explain",True)
         
     		## Get the default model from the settings if it isn't passed in
     	model = model or settings.model
@@ -45,16 +46,21 @@ class EventClassifier(object):
         """
         		
     	## Use the classifier to predict the probabilities of each crime
-    	event_prob = self._classifier.predict_proba(instance)
-    		
-    	return event_prob
+    	most_likely = self._classifier.predict(instance)
+     
+    	return most_likely
     
-    def explain(self):
+    def explain(self, instance):
         """
-        Not sure if we'll need this.
+        List out the classes and the probability for each
         """
-    		## Don't think we need this
-        pass
+        __classes__ = self._classifier.classes_
+        
+        __event_prob__ = self._classifier.predict_proba(instance)
+        #need 0 index on instance b/c we're expecting a numpy.ndarray
+        tags = [[__classes__[i], __event_prob__[0][i]] for i in range(len(__classes__))]
+
+        return tags
     
 
 if __name__ == "__main__":
@@ -68,4 +74,6 @@ if __name__ == "__main__":
              
     for test in tests:
         print classifier.classify(test)
+        for each in classifier.explain(test):
+            print each
     
