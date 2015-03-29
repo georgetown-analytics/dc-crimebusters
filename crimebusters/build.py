@@ -140,7 +140,7 @@ class BuildEventPlanner(object):
             #This is here to preserve the train_time from the initial 
             #classifier build. If a user decides to cross_validate then this 
             #could get overwritten            
-            if not self.train_time:            
+            if self.train_time in None:            
                 self.train_time = time.time() - start 
             
             return classifier
