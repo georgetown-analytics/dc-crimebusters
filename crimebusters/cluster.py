@@ -51,14 +51,14 @@ def main():
     """
     
     #load data from a CSV to a dataframe
-    crime_data = pd.DataFrame.from_csv(settings["crime_data"], sep=',')
+    with open(settings["crime_data"]) as in_data:
+        crime_data = pd.DataFrame.from_csv(in_data, sep=',')
     
-    #get all column headers
-    headers = crime_data.columns
+    crime_data.fillna(value=-999)
     
     #load all numeric data into an array. The offense column from the crime data
     #is excluded
-    as_array = np.asfarray(crime_data[headers[1:]])
+    as_array = np.asfarray(crime_data[["X","Y"]])
     
     #number of groups
     n_clusters=40
