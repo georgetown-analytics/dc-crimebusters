@@ -54,7 +54,7 @@ def main():
     with open(settings["crime_data"]) as in_data:
         crime_data = pd.DataFrame.from_csv(in_data, sep=',')
     
-    crime_data.fillna(value=-999)
+    crime_data=crime_data.fillna(value=-999)
     
     #load all numeric data into an array. The offense column from the crime data
     #is excluded

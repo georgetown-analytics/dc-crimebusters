@@ -18,6 +18,7 @@ from sklearn import svm
 from sklearn import cross_validation
 #from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import Imputer
+from sklearn.pipeline import Pipeline
 
 ########################################################################
 class BuildEventPlanner(object):
@@ -93,9 +94,8 @@ class BuildEventPlanner(object):
             self.feature_time = time.time() - start
         
         
-        imputer = Imputer(missing_values=self.null_value, strategy="mean")
         
-        self.features = imputer.fit_transform(np.array(support_features))
+        self.features = np.array(support_features)
         self.labels = np.array(target_labels)
         
         return self.features, self.labels
@@ -125,22 +125,25 @@ class BuildEventPlanner(object):
                 
             
             
+            #fill in missing values
+            imputer = Imputer(missing_values=self.null_value, strategy='mean')
+
             #Uses all defaults including an radial basis function (rbf)
             #kernal. Refer to this site: http://scikit-learn.org/stable/modules/svm.html
             #Would also be worthwile to investigate sklearn.svm.LinearSVC and sklearn.linear_model.SGDClassifier
             
             #Tried class_weight="auto" but it produced a worse fit 38%
-            classifier = svm.SVC() #currently at 66%
+            clf = svm.SVC() #currently at 66%
             
             #classifier = DecisionTreeClassifier()  #produced 30% accuracy    
-        
+            classifier = Pipeline([('imputer', imputer), ('clf', clf)])
             
             classifier.fit(X, y)
             
             #This is here to preserve the train_time from the initial 
             #classifier build. If a user decides to cross_validate then this 
             #could get overwritten            
-            if self.train_time in None:            
+            if self.train_time is None:            
                 self.train_time = time.time() - start 
             
             return classifier
