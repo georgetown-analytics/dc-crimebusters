@@ -31,11 +31,11 @@ class EventClassifier(object):
         """
         
 		## Get the default model from the settings if it isn't passed in
-		model = model or settings.model
+        model = model or settings.model
 		
 		## Load the model from the pickle
-		with open(model, 'rb') as pkl:
-			self._classifier = pickle.load(pkl)
+        with open(model, 'rb') as pkl:
+            self._classifier = pickle.load(pkl)
 			
     
     def classify(self, instance):
@@ -46,9 +46,9 @@ class EventClassifier(object):
         """
         		
 		## Use the classifier to predict the probabilities of each crime
-		event_prob = self._classifier.predict_proba(instance)
+        event_prob = self._classifier.predict_proba(instance)
 		
-		return event_prob
+        return event_prob
     
     def explain(self):
         """
