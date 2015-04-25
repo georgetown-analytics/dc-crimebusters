@@ -10,11 +10,15 @@ import csv
 import sys 
 import time
 import json
-import pickle 
-import random
+import dill 
+import numpy as np
 from conf import settings
-from sklearn import svm
 from datetime import datetime
+from sklearn import svm
+from sklearn import cross_validation
+#from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import Imputer
+from sklearn.pipeline import Pipeline
 
 ########################################################################
 class BuildEventPlanner(object):
@@ -26,8 +30,10 @@ class BuildEventPlanner(object):
         
         self.filename = in_data or settings["data"]
         self.features = None
+        self.labels = None
         self.classification_field = kwargs.pop("classification_field", "OFFENSE")
         self.accuracy = None
+        self.null_value = kwargs.pop("null_value", -999)
         
         #output directories
         self.out_model = kwargs.pop("out_model",os.path.join("..","fixtures", "model_{0}.pickle".format(today)))
@@ -44,12 +50,12 @@ class BuildEventPlanner(object):
         
         
         #test size for validation. 10 for 10%
-        self.test_size = kwargs.pop("test_size",10)
+        self.n_folds = kwargs.pop("n_folds",12)
         
         #run cross validation. Defaults to True at the start
         self.validate = kwargs.pop("validate", True)
     		
-    def featureset(self):
+    def load_data(self):
         """
         load data into the event planner. There are no inputs becase they are 
         grabbed from the object properties.
@@ -61,11 +67,13 @@ class BuildEventPlanner(object):
         was not able to use a numpy array b/c they do not support multiple 
         data types. I am not using pandas either b/c Allen and Ben 
         keep saying that it is not for production code. 
+
         """
-        if self.features is None:
+        if (self.features is None) or (self.labels is None):
             #rb means read binary 
             start = time.time()
-            self.features = []
+            support_features = []
+            target_labels = []
             
             #open the files to read the data into the object
             with open(self.filename, "rb") as in_data:
@@ -80,39 +88,24 @@ class BuildEventPlanner(object):
                     #fields are in the same order
                     features = [line[field_name] for field_name in line.keys()]
                     
-                    self.features.append((crime,features))
+                    support_features.append(features)
+                    target_labels.append(crime)
         
             self.feature_time = time.time() - start
         
-        return self.features
         
-    def _parse_X_and_y(self, features):
-        """
-        Used to parse out X and y because they are in a tuple.
         
-        Returns X and y in that order
-        """
-        #X's the support vectors. These all have to be 
-        #numeric values so additional data transformation may be required. 
-        #Example error from the initial test ValueError: could not convert string to float: MIDNIGHT
-        X = []
+        self.features = np.array(support_features)
+        self.labels = np.array(target_labels)
         
-        #y is the result/classificaiton. Can be string or integer
-        y = []
-        
-        for item in features:
-            offense, fields = item
-            y.append(offense)
-            X.append(fields)
-            
-        return X, y
+        return self.features, self.labels
                 
         	
-    def train(self, featureset=None, probability=True):
+    def train(self, X=None,y=None):
         """
         This is where the algorithmn will be trained using
         an input featureset. The data should come from
-        self.featureset() but the input parameter 
+        self.load_data() but the input parameter 
         allows for reuse.
         
         Pass in featureset during cross validation 
@@ -123,23 +116,34 @@ class BuildEventPlanner(object):
             
             start = time.time()
             
-            featureset = featureset or self.featureset()
+            if (X is None) or (y is None):
+                if (self.features is None) or (self.labels is None):
+                    X, y = self.load_data()
+                else:
+                    X = self.features
+                    y = self.labels
+                
             
-            X, y = self._parse_X_and_y(featureset)
             
+            #fill in missing values
+            imputer = Imputer(missing_values=self.null_value, strategy='mean')
+
             #Uses all defaults including an radial basis function (rbf)
             #kernal. Refer to this site: http://scikit-learn.org/stable/modules/svm.html
             #Would also be worthwile to investigate sklearn.svm.LinearSVC and sklearn.linear_model.SGDClassifier
             
-            #This classifier produced ~40% accuracy
-            classifier = svm.SVC(probability=probability)
+            #Tried class_weight="auto" but it produced a worse fit 38%
+            clf = svm.SVC() #currently at 66%
+            
+            #classifier = DecisionTreeClassifier()  #produced 30% accuracy    
+            classifier = Pipeline([('imputer', imputer), ('clf', clf)])
             
             classifier.fit(X, y)
             
             #This is here to preserve the train_time from the initial 
             #classifier build. If a user decides to cross_validate then this 
             #could get overwritten            
-            if not self.train_time:            
+            if self.train_time is None:            
                 self.train_time = time.time() - start 
             
             return classifier
@@ -162,15 +166,16 @@ class BuildEventPlanner(object):
         #Builds the classifier with all of the data
         classifier = self.train()
         
-        with open(self.out_model, "w") as target:
-            sys.stdout.write("Saving model to {0}".format(self.out_model))
-            pickle.dump(classifier, target, pickle.HIGHEST_PROTOCOL)
+        with open(self.out_model, "wb") as target:
+            sys.stdout.write("Saving model to {0}\n".format(self.out_model))
+            dill.dump(classifier, target, dill.HIGHEST_PROTOCOL)
             
         if self.validate:
             self.cross_validate()
             
         self.build_time = time.time() - start
         self.write_details()
+        return classifier
         
                 
         
@@ -181,42 +186,36 @@ class BuildEventPlanner(object):
         
         See documentation here: http://scikit-learn.org/stable/modules/cross_validation.html
         """
-        
         sys.stdout.write("Cross validation...\n")
         sys.stdout.write(time.ctime()+"\n")        
         
         start = time.time()
         
+        n_folds = self.n_folds
+        scores = []
+        
         #not sure if i can use self.features or should generate a whole new featureset
-        if not self.features:
-            features = self.featureset()
+        if (self.features is None) or (self.labels is None):
+            features, labels  = self.load_data()
         else:
             features = self.features
+            labels = self.labels
         
-        #get 10% sample size
-        test_size = len(features)/10
+        kf = cross_validation.KFold(len(features), n_folds, random_state=np.random)
         
-        #randomize feature organization
-        random.shuffle(features)
+        for train, test in kf:
+            X_train, X_test = features[train], features[test]
+            y_train, y_test = labels[train], labels[test]
         
-        #train 90%, test 10%
-        train = features[test_size:]
-        test = features[:test_size]
         
-        classifier = self.train(featureset=train, probability=False)
-        self.accuracy = self.get_score(classifier, test)
+            classifier = self.train(X_train, y_train)
+            scores.append(classifier.score(X_test, y_test))
+        self.accuracy = sum(scores)/len(scores) #average score of the folds
         self.test_time = time.time() - start 
         
         sys.stdout.write("Model accuracy: {0}%\n".format(round(self.accuracy*100,3)))
+
         
-    def get_score(self, classifier, test_set):
-        """
-        Returns the score of the classifier. test_set needs
-        to be parsed because y and X are in a tuple (y, X) per self.featureset()
-        """
-        X, y = self._parse_X_and_y(test_set)
-        
-        return classifier.score(X,y)
         
     def __check_output_paths(self):
         """
@@ -241,7 +240,7 @@ class BuildEventPlanner(object):
         "test time" : self.test_time,
         "feature strucutre time" : self.feature_time,
         "validation" : self.validate,
-        "test size" : "{0}%".format(self.test_size) if self.test_size else self.test_size
+        "folds" : self.n_folds
         }
         
         with open(self.out_model_log, 'w') as target:
@@ -250,7 +249,9 @@ class BuildEventPlanner(object):
         
     
 if __name__ == "__main__":
-    event_planner = BuildEventPlanner(settings["data"])
+    
+    #used 3 folds b/c of the limited number of classes
+    event_planner = BuildEventPlanner(settings["data"], n_folds=3)
     event_planner.build()
     #raw_input("\nPress enter to quit.")
         

@@ -71,7 +71,7 @@ class GeographicallyWeightedRegression(object):
         dependent = dbf.by_col(self.dependent_var)
         
         #turn it into a numpy type
-        dependent_array = np.array(dependent)
+        dependent_array = np.asfarray(dependent)
         
         #requires nx1 array. Not sure if we need this        
         dependent_array.shape = (len(dependent),1)
@@ -87,7 +87,7 @@ class GeographicallyWeightedRegression(object):
         new_array = [dbf.by_col(col) for col in self.independent_vars]
         
         #turn the list of columns into an array, transpose, and return
-        return np.array(new_array).T
+        return np.asfarray(new_array).T
         
     def _save_summary(self, ols):
         """
@@ -161,9 +161,21 @@ class GeographicallyWeightedRegression(object):
         
         
 if __name__ == "__main__":
+    """
+    StationAtt	Max of MetRid2014
+    StationA_1	Average of Per Public Transit
+    StationA_2	Crime Count 2014
+    StationA_3	Average of Median home value in hundred thousands
+    StationA_4	Average of Per Below Poverty Line
+    StationA_5	Average of Per Long Commute
+    StationA_6	Average of Per Vacant Houses
+    StationA_7	Average of Distance from metro KM
+    StationA_8 CrimePerRider
+
+    """
     shapefile= settings["shapefile"]
-    dependent = "CrimPerRid"
-    independent = ['PerUnPover', 'PerVacHous','PerLongCom']#, 'PerComMet']
+    dependent = "StationA_8"
+    independent = ['StationA_1', 'StationA_2','StationA_3','StationA_4', 'StationA_5', 'StationA_6', 'StationA_7']
     gwr = GeographicallyWeightedRegression(shapefile,dependent, 
                                            independent,
                                            spatial_relationship="queen", 

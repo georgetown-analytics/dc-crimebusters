@@ -34,6 +34,8 @@ class CrimeBustersConfig(confire.Configuration):
     shapefile = None
     spatial_regression_summary = None
     dbf_file = None
+    crime_data = None
+    model = None
     
 settings = CrimeBustersConfig.load()
 
