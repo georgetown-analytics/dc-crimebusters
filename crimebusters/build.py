@@ -12,13 +12,13 @@ import time
 import json
 import dill 
 import numpy as np
+from sklearn import svm
 from conf import settings
 from datetime import datetime
-from sklearn import svm
 from sklearn import cross_validation
-#from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import Imputer
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import Imputer
+from sklearn.grid_search import GridSearchCV
 
 ########################################################################
 class BuildEventPlanner(object):
@@ -35,6 +35,8 @@ class BuildEventPlanner(object):
         self.accuracy = None
         self.null_value = kwargs.pop("null_value", -999)
         
+        self.params = kwargs.pop('params', {'C':[.1, 1, 10, 100]})
+        
         #output directories
         self.out_model = kwargs.pop("out_model",os.path.join("..","fixtures", "model_{0}.pickle".format(today)))
         self.out_model_log = kwargs.pop("out_log",os.path.join("..","fixtures", "info_{0}.json".format(today)))
@@ -47,7 +49,6 @@ class BuildEventPlanner(object):
         self.feature_time = None    
         self.test_time = None
         self.build_time = None
-        
         
         #test size for validation. 10 for 10%
         self.n_folds = kwargs.pop("n_folds",12)
@@ -67,7 +68,6 @@ class BuildEventPlanner(object):
         was not able to use a numpy array b/c they do not support multiple 
         data types. I am not using pandas either b/c Allen and Ben 
         keep saying that it is not for production code. 
-
         """
         if (self.features is None) or (self.labels is None):
             #rb means read binary 
@@ -93,13 +93,10 @@ class BuildEventPlanner(object):
         
             self.feature_time = time.time() - start
         
-        
-        
         self.features = np.array(support_features)
         self.labels = np.array(target_labels)
         
         return self.features, self.labels
-                
         	
     def train(self, X=None,y=None):
         """
@@ -123,8 +120,6 @@ class BuildEventPlanner(object):
                     X = self.features
                     y = self.labels
                 
-            
-            
             #fill in missing values
             imputer = Imputer(missing_values=self.null_value, strategy='mean')
 
@@ -132,11 +127,14 @@ class BuildEventPlanner(object):
             #kernal. Refer to this site: http://scikit-learn.org/stable/modules/svm.html
             #Would also be worthwile to investigate sklearn.svm.LinearSVC and sklearn.linear_model.SGDClassifier
             
+            
             #Tried class_weight="auto" but it produced a worse fit 38%
             clf = svm.SVC() #currently at 66%
             
+            grid_search = GridSearchCV(clf, param_grid=self.params)
+            
             #classifier = DecisionTreeClassifier()  #produced 30% accuracy    
-            classifier = Pipeline([('imputer', imputer), ('clf', clf)])
+            classifier = Pipeline([('imputer', imputer), ('clf', grid_search)])
             
             classifier.fit(X, y)
             
@@ -151,7 +149,6 @@ class BuildEventPlanner(object):
         except ValueError as error:
             #SVM will throw this if all the support vectors are not numeric
             raise ValueError(error)
-        
     
     def build(self):
         """
@@ -176,8 +173,6 @@ class BuildEventPlanner(object):
         self.build_time = time.time() - start
         self.write_details()
         return classifier
-        
-                
         
     def cross_validate(self):
         """
@@ -215,8 +210,6 @@ class BuildEventPlanner(object):
         
         sys.stdout.write("Model accuracy: {0}%\n".format(round(self.accuracy*100,3)))
 
-        
-        
     def __check_output_paths(self):
         """
         function that returns where the model outputs
@@ -246,6 +239,9 @@ class BuildEventPlanner(object):
         with open(self.out_model_log, 'w') as target:
             sys.stdout.write("Saving log to {0}".format(self.out_model_log))
             json.dump(details, target, indent=4)
+            
+    def make_roc_curve(self):
+        pass
         
     
 if __name__ == "__main__":
