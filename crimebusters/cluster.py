@@ -77,14 +77,17 @@ def main():
     
     pdict = create_ordered_dict(crime_data, "labels")
     
-    #location of output graph
-    file_name = os.path.join("..", 'tests', "kmeans_clusters_{0}.html".format(time_stamp()))
-    output_file(file_name)
+    crime_data.to_csv(r'C:\users\andrew_woizesko\desktop\knn.csv')
+    np.savetxt(r'C:\users\andrew_woizesko\desktop\centers.csv', cluster.cluster_centers_)
     
-    #create out graph
-    TOOLS="pan,wheel_zoom,box_zoom,reset"
-    scatter = Scatter(pdict.values(), title="Crime Clusters", filename=file_name, tools=TOOLS)
-    scatter.show()
+#    #location of output graph
+#    file_name = os.path.join("..", 'tests', "kmeans_clusters_{0}.html".format(time_stamp()))
+#    output_file(file_name)
+#    
+#    #create out graph
+#    TOOLS="pan,wheel_zoom,box_zoom,reset"
+#    scatter = Scatter(pdict.values(), title="Crime Clusters", filename=file_name, tools=TOOLS)
+#    scatter.show()
 
 
 if __name__ == "__main__":

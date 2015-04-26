@@ -145,10 +145,10 @@ class GeographicallyWeightedRegression(object):
         #This is set up to run Moran's I on the residuals to ensure
         #they are not spatially correlated and White's test. --> need to
         #find out more what that test does.
-        ols = pysal.spreg.OLS(self.dependent_array, self.independent_array,
+        ols = pysal.spreg.GM_Error_Hom(self.dependent_array, self.independent_array,
                               w=self.weights, name_y=self.dependent_var, 
-                              name_x=self.independent_vars, name_ds=os.path.basename(self.infile),
-                                spat_diag=True, moran=True, white_test=True)
+                              name_x=self.independent_vars, name_w=self.spat_weights,
+                              name_ds=os.path.basename(self.infile))#, spat_diag=True, moran=True, white_test=True)
                                 
         if self.outfile_summary:
             self._save_summary(ols)
@@ -172,10 +172,17 @@ if __name__ == "__main__":
     StationA_7	Average of Distance from metro KM
     StationA_8 CrimePerRider
 
+    Model results
+    
+    R-squared tells you how well the model performed
+    F-Stat when significant tells you the overal model significance but is only valid when the Koenker-Bassett and Breusch-Pagan tests is not significant
+    Breusch-Pagan and Koenker-Bassett tests determine whether or not the explanitory variables have a consistent relationship. When significant, you should run GWR
+    Jarque-Bera when significant tells you that your residuals are not normally distributed, and there could be strong heterostaticity
+    
     """
     shapefile= settings["shapefile"]
     dependent = "StationA_8"
-    independent = ['StationA_1', 'StationA_2','StationA_3','StationA_4', 'StationA_5', 'StationA_6', 'StationA_7']
+    independent = ['StationA_7', 'StationA_4']#['StationA_1', 'StationA_3','StationA_4', 'StationA_5', 'StationA_6', 'StationA_7']
     gwr = GeographicallyWeightedRegression(shapefile,dependent, 
                                            independent,
                                            spatial_relationship="queen", 
