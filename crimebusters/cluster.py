@@ -82,6 +82,7 @@ def main():
     
     #location of output graph
     file_name = os.path.join("..", 'tests', "kmeans_clusters_{0}.html".format(time_stamp()))
+    
     output_file(file_name)
     
     #create out graph
