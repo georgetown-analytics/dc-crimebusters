@@ -77,8 +77,12 @@ def main():
     
     pdict = create_ordered_dict(crime_data, "labels")
     
+    crime_data.to_csv(r'C:\users\andrew_woizesko\desktop\knn.csv')
+    np.savetxt(r'C:\users\andrew_woizesko\desktop\centers.csv', cluster.cluster_centers_)
+    
     #location of output graph
     file_name = os.path.join("..", 'tests', "kmeans_clusters_{0}.html".format(time_stamp()))
+    
     output_file(file_name)
     
     #create out graph
