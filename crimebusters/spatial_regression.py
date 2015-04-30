@@ -145,7 +145,7 @@ class GeographicallyWeightedRegression(object):
         #This is set up to run Moran's I on the residuals to ensure
         #they are not spatially correlated and White's test. --> need to
         #find out more what that test does.
-        ols = pysal.spreg.GM_Error_Hom(self.dependent_array, self.independent_array,
+        ols = pysal.spreg.GM_Combo_Het(self.dependent_array, self.independent_array,
                               w=self.weights, name_y=self.dependent_var, 
                               name_x=self.independent_vars, name_w=self.spat_weights,
                               name_ds=os.path.basename(self.infile))#, spat_diag=True, moran=True, white_test=True)
@@ -155,6 +155,7 @@ class GeographicallyWeightedRegression(object):
         self._summary = ols.summary
         
         open_dbf.close()
+        return ols
         
     def print_summary(self):
         print self._summary
