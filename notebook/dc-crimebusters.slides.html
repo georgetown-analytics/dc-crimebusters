@@ -269,7 +269,6 @@ div.output_prompt {
 <p>Percent of Occupied Homes:  The more occupied homes, the less likely crime will occur.</p>
 <p>Percent below the Poverty Line:  The more residences below the poverty line, the more likely crime will occur.</p>
 <p>Median Home Value:  The higher the median home value, the less likely crime will occur.</p>
-<p>Median Household Income:  The higher the household income, the less likely crime will occur.</p>
 
 </div>
 </div>
@@ -358,7 +357,7 @@ div.output_prompt {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Mapping individual variables against the dependent variable begins to reveal relationships. Through our investigation of the two graphs below, we were able to identify two potential explainitory variables - distance from Metro stations and percentage of households below the poverty line.</p>
+<p>Mapping individual variables against the dependent variable begins to reveal relationships. Through our investigation of the two graphs below, we were able to identify two potential explanatory variables - distance from Metro stations and percentage of households below the poverty line.</p>
 
 </div>
 </div>
@@ -968,7 +967,7 @@ div.output_prompt {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>To get a better sense of the crime envrionment, we calculated yearly crime rate per Metro trip and aggregated the rate to the Metro neightborhoods. In the interactive map below, you can see higher rates of crime in Stadium Armory Metro neighborhood and much lower rates in Federal Triangle and the Smithsonian.</p>
+<p>To get a better sense of the crime environment, we calculated yearly crime rate per Metro trip and aggregated the rate to the Metro neighborhoods. In the interactive map below, you can see higher rates of crime in Stadium Armory Metro neighborhood and much lower rates in Federal Triangle and the Smithsonian.</p>
 <p>We wanted to see if crime clustered around Metro stations. Using k means clustering where k equals 40 (for 40 Metro stations) we grouped each crime. The black dots on the map below display the crime centers and the red dots represent the Metro stations within the District. If you zoom in, the Metro neighborhoods disappear and the crime events appear and are colored by cluster.</p>
 
 </div>
@@ -1368,7 +1367,7 @@ Warnings:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>To fit a model that considered spatial distribution, we turned to PySal (Python Spatial Analysis Library). PySal allows a user to enter a spatial weights matrix to represent geographic relationships - in our case the neighborhoods. When we fit a geographic OLS we discovered that the residuals were not randomly distributed over the study area and we saw nonstationarity (heteroskedasticity) indicating spatialy dependency. This aspect made our model untrustworthy so we turned to a two stage geographically weighted regression that accounts for spatial lag and heteroskedasticity. Below, we build a class to wrap the regression function. Using a shapefile (a geographic data model format) we construct the class and fit the regression.</p>
+<p>To fit a model that considered spatial distribution, we turned to PySal (Python Spatial Analysis Library). PySal allows a user to enter a spatial weights matrix to represent geographic relationships - in our case the neighborhoods. When we fit a geographic OLS we discovered that the residuals were not randomly distributed over the study area and we saw nonstationarity (heteroskedasticity) indicating spatial dependency. This aspect made our model untrustworthy so we turned to a two stage geographically weighted regression that accounts for spatial lag and heteroskedasticity. Below, we build a class to wrap the regression function. Using a shapefile (a geographic data model format) we construct the class and fit the regression.</p>
 
 </div>
 </div>
@@ -1618,7 +1617,7 @@ Instruments: W_StationA_4, W_StationA_7
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Planning-a-trip">Planning a trip<a class="anchor-link" href="#Planning-a-trip">&#182;</a></h1><p>Now that we know more about the relationships and the crime environemnt within the District, we want to help riders plan their trips. To do this, we created a Support Vector classifier (SVC) that considers crime location, demmographic information and time of data. The exmaple below shows an example of raw data being used to predict what crime you might encounter. The SVC was wrapped in a pipline that optimized the build with Grid Search and an imputer to fix null values. The classifer performs at 43% accuracy. The class below is used to load the SVC to classifiy inputs.</p>
+<h1 id="Planning-a-trip">Planning a trip<a class="anchor-link" href="#Planning-a-trip">&#182;</a></h1><p>Now that we know more about the relationships and the crime environment within the District, we want to help riders plan their trips. To do this, we created a Support Vector classifier (SVC) that considers crime location, demographic information and time of data. The example below shows an example of raw data being used to predict what crime you might encounter. The SVC was wrapped in a pipeline that optimized the build with Grid Search and an imputer to fix null values. The classifier performs at 43% accuracy. The class below is used to load the SVC to classify inputs.</p>
 
 </div>
 </div>
