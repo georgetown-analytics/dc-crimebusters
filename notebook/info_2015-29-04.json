@@ -1,0 +1,11 @@
+{
+    "classification field": "OFFENSE", 
+    "validation": true, 
+    "feature strucutre time": 0.46899986267089844, 
+    "test time": 25119.111000061035, 
+    "folds": 3, 
+    "in data": "C:/Users/andrew_woizesko/Documents/Georgetown Data Science/Capstone/Data_Restart_8_April/Working_data/CrimeEvents_ForClassifier.csv", 
+    "build time": 27403.16200017929, 
+    "train time": 2284.0360000133514, 
+    "accuracy": 0.43787981761863665
+}

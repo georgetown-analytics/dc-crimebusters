@@ -143,8 +143,7 @@ class GeographicallyWeightedRegression(object):
         
         #run the OLS
         #This is set up to run Moran's I on the residuals to ensure
-        #they are not spatially correlated and White's test. --> need to
-        #find out more what that test does.
+        #they are not spatially correlated and White's test.
         ols = pysal.spreg.GM_Combo_Het(self.dependent_array, self.independent_array,
                               w=self.weights, name_y=self.dependent_var, 
                               name_x=self.independent_vars, name_w=self.spat_weights,
@@ -172,7 +171,7 @@ if __name__ == "__main__":
     StationA_6	Average of Per Vacant Houses
     StationA_7	Average of Distance from metro KM
     StationA_8 CrimePerRider
-
+    
     Model results
     
     R-squared tells you how well the model performed
